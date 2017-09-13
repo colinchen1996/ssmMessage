@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.lanqiao.dao.UserMessageDao">
+  <resultMap id="UserMessageResult" type="org.lanqiao.entity.UserMessage">
+    <id column="floor" jdbcType="INTEGER" property="floor" />
+    <result column="author" jdbcType="VARCHAR" property="author" />
+    <result column="message" jdbcType="VARCHAR" property="message" />
+    <result column="time" jdbcType="DATE" property="time" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    floor, author, message, time
+  </sql>
+  <!--    id:dao接口中的方法名                          parameterType：方法参数                                            resultMap：返回值类型-->
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="UserMessageResult">
+    select 
+    <include refid="Base_Column_List" />
+    from usermessage
+    where floor = #{floor,jdbcType=INTEGER}
+  </select>
+  
+  <!--自定义接口中的查询方法 -->
+   <select id="selectAllUserMessage" resultMap="UserMessageResult">
+    select 
+    <include refid="Base_Column_List" />
+    from usermessage
+  </select>
+  <!-- 自定义查询表中记录条数 -->
+   <select id="selectTotalFloor" resultType="java.lang.Integer">
+    select 
+    count(*)
+    from usermessage
+  </select>
+  <!-- 自定义分页查询 -->
+  <select id="selectUserByPage" resultMap="UserMessageResult">
+    select 
+    <include refid="Base_Column_List" />
+    from usermessage 
+    order by floor desc 
+    limit #{0},#{1}
+  </select>
+   <!-- 自定义条件查询 -->
+  <select id="selectMessageByCondition" parameterType="java.util.Map" resultMap="UserMessageResult">
+    select 
+    <include refid="Base_Column_List" />
+    from usermessage 
+    <trim prefix="WHERE" prefixOverrides="AND">
+    <if test="title != null">
+    	message like #{title}
+    </if>
+    <if test="startDate != null">
+    	<![CDATA[and time >= #{startDate}]]>
+    </if>
+    <if test="endDate != null">
+    	<![CDATA[and time <= #{endDate}]]>
+    </if>
+    </trim>
+    order by floor desc 
+    limit #{startNum},#{pageSize}
+  </select>
+  
+  <select id="selectConditionCount" parameterType="java.util.Map" resultType="java.lang.Integer">
+    select 
+    count(*)
+    from usermessage 
+    <trim prefix="WHERE" prefixOverrides="AND">
+    <if test="title != null">
+    	message like #{title}
+    </if>
+    <if test="startDate != null">
+    	<![CDATA[and time >= #{startDate}]]>
+    </if>
+    <if test="endDate != null">
+    	<![CDATA[and time <= #{endDate}]]>
+    </if>
+    </trim>
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from usermessage
+    where floor = #{floor,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="org.lanqiao.entity.UserMessage">
+    insert into usermessage (floor, author, message, 
+      time)
+    values (#{floor,jdbcType=INTEGER}, #{author,jdbcType=VARCHAR}, #{message,jdbcType=VARCHAR}, 
+      #{time,jdbcType=DATE})
+  </insert>
+  <insert id="insertSelective" parameterType="org.lanqiao.entity.UserMessage">
+    insert into usermessage
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="floor != null">
+        floor,
+      </if>
+      <if test="author != null">
+        author,
+      </if>
+      <if test="message != null">
+        message,
+      </if>
+      <if test="time != null">
+        time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="floor != null">
+        #{floor,jdbcType=INTEGER},
+      </if>
+      <if test="author != null">
+        #{author,jdbcType=VARCHAR},
+      </if>
+      <if test="message != null">
+        #{message,jdbcType=VARCHAR},
+      </if>
+      <if test="time != null">
+        #{time,jdbcType=DATE},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="org.lanqiao.entity.UserMessage">
+    update usermessage
+    <set>
+      <if test="author != null">
+        author = #{author,jdbcType=VARCHAR},
+      </if>
+      <if test="message != null">
+        message = #{message,jdbcType=VARCHAR},
+      </if>
+      <if test="time != null">
+        time = #{time,jdbcType=DATE},
+      </if>
+    </set>
+    where floor = #{floor,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="org.lanqiao.entity.UserMessage">
+    update usermessage
+    set author = #{author,jdbcType=VARCHAR},
+      message = #{message,jdbcType=VARCHAR},
+      time = #{time,jdbcType=DATE}
+    where floor = #{floor,jdbcType=INTEGER}
+  </update>
+</mapper>
